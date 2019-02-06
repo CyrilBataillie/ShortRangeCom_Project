@@ -8,11 +8,8 @@ Created on Tue Feb  5 14:48:36 2019
 # Load the Pandas libraries with alias 'pd' 
 import pandas as pd 
 import numpy as np
-#import os
 
-# Read data from file 'filename.csv' 
-# (in the same directory that your python process is based)
-# Control delimiters, rows, column names with read_csv (see later) 
+
 nameList = ["RefList", "reader", "date", "time", "TimeStamp", "Tagid", "ReaderAnt", "Freq", "Rssi", "phase"]
 nbTagsParList = 25
 
@@ -30,19 +27,19 @@ nbTagsLusParReflist = data.groupby('RefList').Tagid.nunique()
 
 
 
-
-
 doorA = [1,2] #doorA with reader 1 and 2
 doorB = [3,4] #doorA with reader 3 and 4
 nbGoodDoors = 0
+nbGoodDoors2 = 0
 
-tempList=[]
+tagsInDoorA = []
+tagsInDoorB = []
+tagNotReadable = []
 
 for tag in readTagList:
     m = data['Tagid'] == tag
     extractWithReadTag = data.where(m)
     listReadersForThisTag = extractWithReadTag.ReaderAnt.unique()
-    tempList.append(listReadersForThisTag)
     listRefListForThisTag = extractWithReadTag.RefList.unique()
     
     goodDoor = False
@@ -53,12 +50,35 @@ for tag in readTagList:
         goodDoor = True
         nbGoodDoors += 1
 
-    
+    else:
+        extractDoorA1 = extractWithReadTag[extractWithReadTag['ReaderAnt'] == 1]
+        extractDoorA2 = extractWithReadTag[extractWithReadTag['ReaderAnt'] == 2]
+        extractDoorA = pd.concat([extractDoorA1, extractDoorA2])
+        
+        extractDoorB3 = extractWithReadTag[extractWithReadTag['ReaderAnt'] == 3]
+        extractDoorB4 = extractWithReadTag[extractWithReadTag['ReaderAnt'] == 4]
+        extractDoorB = pd.concat([extractDoorB3, extractDoorB4])
+        
+        avgRssiA = extractDoorA.Rssi.mean()
+        avgRssiB = extractDoorB.Rssi.mean()
+        
+        if (avgRssiA > avgRssiB):
+            tagsInDoorA.append(tag)
+            
+            if "Reference List 3" in listRefListForThisTag:
+                goodDoor = True
+            
+        elif (avgRssiB > avgRssiA):
+            tagsInDoorB.append(tag)
+            
+            if "Reference List 4" in listRefListForThisTag:
+                goodDoor = True
+        
+        else:
+            tagNotReadable.append(tag)
 
-
-
-
-
+    if (goodDoor):
+        nbGoodDoors2 += 1
 
    
 #read rate = nb tag lus / nb tags total de tags qui passent par les portes
@@ -67,3 +87,4 @@ readRate = (len(readTagList)) / (2 * nbTagsParList)
     
 #assocation rate = nb tag lus uniquement par la bonne porte / nb total de tags lus          
 associationRate = nbGoodDoors / len(readTagList)
+associationRateAfterImprovement = nbGoodDoors2 / len(readTagList)
