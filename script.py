@@ -34,7 +34,7 @@ nbGoodDoors2 = 0
 
 tagsInDoorA = []
 tagsInDoorB = []
-tagNotReadable = []
+badAssociation = []
 
 for tag in readTagList:
     m = data['Tagid'] == tag
@@ -67,15 +67,21 @@ for tag in readTagList:
             
             if "Reference List 3" in listRefListForThisTag:
                 goodDoor = True
+            else:
+                tagsInDoorA.pop()
+                badAssociation.append(tag)
             
         elif (avgRssiB > avgRssiA):
             tagsInDoorB.append(tag)
             
             if "Reference List 4" in listRefListForThisTag:
                 goodDoor = True
+            else:
+                tagsInDoorB.pop()
+                badAssociation.append(tag)
         
         else:
-            tagNotReadable.append(tag)
+            badAssociation.append(tag)
 
     if (goodDoor):
         nbGoodDoors2 += 1
