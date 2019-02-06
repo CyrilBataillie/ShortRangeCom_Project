@@ -25,11 +25,23 @@ data_30dbm = pd.read_csv("Inventory 2019-01-22 09-10-13 30dBm.csv", sep=';', nam
 #to show first 5 rows
 #data_30dbm.head()
 
-listeTagsLus = data_24dbm.groupby('RefList').Tagid.nunique()
+nbTagsLusParReflist = data_24dbm.groupby('RefList').Tagid.nunique()
 
-#♣read rate = nb tag de la bonne liste lus / nb tags total dans la liste
-readRate = (listeTagsLus[0] + listeTagsLus[1]) / (2 * nbTagsParList)
+#read rate = nb tag lus / nb tags total de tags qui passent par les portes
+readRate = (nbTagsLusParReflist[0] + nbTagsLusParReflist[1]) / (2 * nbTagsParList)
 
-data_30dbm.groupby('Tagid').ReaderAnt.nunique()
+
+
 
 tagList = data_30dbm.Tagid.unique()
+
+
+#door detection program
+doorA = [3,4]
+doorB = [1,2]
+
+
+
+
+
+
