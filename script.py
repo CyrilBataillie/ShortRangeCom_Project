@@ -37,8 +37,8 @@ tagList = data_30dbm.Tagid.unique()
 
 
 #door detection program
-doorA = [3,4]
-doorB = [1,2]
+doorA = [1,2] #doorA with reader 1 and 2
+doorB = [3,4] #doorA with reader 3 and 4
 
 
 
