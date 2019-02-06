@@ -21,27 +21,49 @@ data_24dbm = pd.read_csv("Inventory 2019-01-22 09-56-51 24dBm.csv", sep=';', nam
 data_27dbm = pd.read_csv("Inventory 2019-01-22 10-02-50 27dBm.csv", sep=';', names=nameList, index_col=False)
 data_30dbm = pd.read_csv("Inventory 2019-01-22 09-10-13 30dBm.csv", sep=';', names=nameList, index_col=False)
 
-
-#to show first 5 rows
-#data_30dbm.head()
-
-nbTagsLusParReflist = data_24dbm.groupby('RefList').Tagid.nunique()
-
-#read rate = nb tag lus / nb tags total de tags qui passent par les portes
-readRate = (nbTagsLusParReflist[0] + nbTagsLusParReflist[1]) / (2 * nbTagsParList)
-
-
+data = data_30dbm
 
 
 tagList = data_30dbm.Tagid.unique()
+readTagList = data.Tagid.unique()
+nbTagsLusParReflist = data.groupby('RefList').Tagid.nunique()
 
 
-#door detection program
+
+
+
 doorA = [1,2] #doorA with reader 1 and 2
 doorB = [3,4] #doorA with reader 3 and 4
+nbGoodDoors = 0
+
+tempList=[]
+
+for tag in readTagList:
+    m = data['Tagid'] == tag
+    extractWithReadTag = data.where(m)
+    listReadersForThisTag = extractWithReadTag.ReaderAnt.unique()
+    tempList.append(listReadersForThisTag)
+    listRefListForThisTag = extractWithReadTag.RefList.unique()
+    
+    goodDoor = False
+    interA = np.intersect1d(listReadersForThisTag, doorA)
+    interB = np.intersect1d(listReadersForThisTag, doorB)
+    
+    if (len(interA)>0 and not len(interB)>0) or (len(interB)>0 and not len(interA)>0):
+        goodDoor = True
+        nbGoodDoors += 1
+
+    
 
 
 
 
 
 
+   
+#read rate = nb tag lus / nb tags total de tags qui passent par les portes
+readRate = (len(readTagList)) / (2 * nbTagsParList)
+
+    
+#assocation rate = nb tag lus uniquement par la bonne porte / nb total de tags lus          
+associationRate = nbGoodDoors / len(readTagList)
