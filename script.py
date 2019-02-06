@@ -13,7 +13,8 @@ import numpy as np
 # Read data from file 'filename.csv' 
 # (in the same directory that your python process is based)
 # Control delimiters, rows, column names with read_csv (see later) 
-nameList = ["RefList", "reader", "date", "time", "TimeStamp", "Tagid", "ReaderAnt", "Freq", "Rssl", "phase"]
+nameList = ["RefList", "reader", "date", "time", "TimeStamp", "Tagid", "ReaderAnt", "Freq", "Rssi", "phase"]
+nbTagsParList = 25
 
 data_21dbm = pd.read_csv("Inventory 2019-01-22 10-07-45 21dBm.csv", sep=';', names=nameList, index_col=False)
 data_24dbm = pd.read_csv("Inventory 2019-01-22 09-56-51 24dBm.csv", sep=';', names=nameList, index_col=False)
@@ -24,6 +25,10 @@ data_30dbm = pd.read_csv("Inventory 2019-01-22 09-10-13 30dBm.csv", sep=';', nam
 #to show first 5 rows
 #data_30dbm.head()
 
+listeTagsLus = data_24dbm.groupby('RefList').Tagid.nunique()
+
+#♣read rate = nb tag de la bonne liste lus / nb tags total dans la liste
+readRate = (listeTagsLus[0] + listeTagsLus[1]) / (2 * nbTagsParList)
 
 data_30dbm.groupby('Tagid').ReaderAnt.nunique()
 
